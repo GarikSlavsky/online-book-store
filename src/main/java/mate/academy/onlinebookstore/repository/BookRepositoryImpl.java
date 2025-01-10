@@ -1,22 +1,18 @@
 package mate.academy.onlinebookstore.repository;
 
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import mate.academy.onlinebookstore.exceptions.DataProcessingException;
 import mate.academy.onlinebookstore.model.Book;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@RequiredArgsConstructor
 public class BookRepositoryImpl implements BookRepository {
     private final SessionFactory sessionFactory;
-
-    @Autowired
-    public BookRepositoryImpl(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
 
     @Override
     public Book save(Book book) {
@@ -32,7 +28,7 @@ public class BookRepositoryImpl implements BookRepository {
             if (transaction != null) {
                 transaction.rollback();
             }
-            throw new RuntimeException("Cannot insert book " + book, e);
+            throw new DataProcessingException("Cannot insert book " + book, e);
         } finally {
             if (session != null) {
                 session.close();
@@ -45,9 +41,8 @@ public class BookRepositoryImpl implements BookRepository {
         try (Session session = sessionFactory.openSession()) {
             return session.createQuery("SELECT b FROM Book b", Book.class)
                     .getResultList();
-        } catch (HibernateException e) {
-            throw new RuntimeException("Cannot get list of books", e);
+        } catch (Exception e) {
+            throw new DataProcessingException("Cannot get list of books", e);
         }
-
     }
 }
