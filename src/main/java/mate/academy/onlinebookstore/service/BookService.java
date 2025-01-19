@@ -9,7 +9,5 @@ public interface BookService {
 
     BookDto getBookById(Long id);
 
-    List<BookDto> getByAuthor(String authorName);
-
     List<BookDto> findAllBooks();
 }

@@ -9,7 +9,5 @@ public interface BookRepository {
 
     Optional<Book> findById(Long id);
 
-    List<Book> findByAuthor(String name);
-
     List<Book> findAll();
 }
