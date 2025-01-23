@@ -40,10 +40,3 @@ databaseChangeLog:
               - column:
                   name: cover_image
                   type: varchar(255)
-      rollback:
-        - update:
-            tableName: books
-            columns:
-              - column:
-                  name: cover_image
-                  type: varchar(255)
