@@ -1,7 +1,11 @@
 package mate.academy.onlinebookstore.repository.book.specification;
 
+import static mate.academy.onlinebookstore.dto.book.BookSearchParametersDto.AUTHOR;
+import static mate.academy.onlinebookstore.dto.book.BookSearchParametersDto.DESCRIPTION;
+import static mate.academy.onlinebookstore.dto.book.BookSearchParametersDto.PRICE;
+import static mate.academy.onlinebookstore.dto.book.BookSearchParametersDto.TITLE;
+
 import lombok.RequiredArgsConstructor;
-import mate.academy.onlinebookstore.dto.ParameterSearcher;
 import mate.academy.onlinebookstore.dto.book.BookSearchParametersDto;
 import mate.academy.onlinebookstore.model.Book;
 import mate.academy.onlinebookstore.repository.SpecificationBuilder;
@@ -15,29 +19,28 @@ public class BookSpecificationBuilder implements SpecificationBuilder<Book> {
     private final SpecificationProviderManager<Book> specificationProviderManager;
 
     @Override
-    public Specification<Book> build(ParameterSearcher parameters) {
+    public Specification<Book> build(BookSearchParametersDto parameters) {
         Specification<Book> spec = Specification.where(null);
-        BookSearchParametersDto bookParams = (BookSearchParametersDto) parameters;
 
-        if (parameterValidator(bookParams.title())) {
+        if (parameterValidator(parameters.title())) {
             spec = spec.and(specificationProviderManager
-                    .getSpecificationProvider("title")
-                    .getSpecification(bookParams.title()));
+                    .getSpecificationProvider(TITLE)
+                    .getSpecification(parameters.title()));
         }
-        if (parameterValidator(bookParams.author())) {
+        if (parameterValidator(parameters.author())) {
             spec = spec.and(specificationProviderManager
-                    .getSpecificationProvider("author")
-                    .getSpecification(bookParams.author()));
+                    .getSpecificationProvider(AUTHOR)
+                    .getSpecification(parameters.author()));
         }
-        if (bookParams.priceGreaterThan() != null && bookParams.priceLessThan() != null) {
+        if (parameters.priceGreaterThan() != null && parameters.priceLessThan() != null) {
             spec = spec.and(specificationProviderManager
-                    .getSpecificationProvider("price")
-                    .getSpecification(bookParams.priceGreaterThan(), bookParams.priceLessThan()));
+                    .getSpecificationProvider(PRICE)
+                    .getSpecification(parameters.priceGreaterThan(), parameters.priceLessThan()));
         }
-        if (parameterValidator(bookParams.description())) {
+        if (parameterValidator(parameters.description())) {
             spec = spec.and(specificationProviderManager
-                    .getSpecificationProvider("description")
-                    .getSpecification(bookParams.description()));
+                    .getSpecificationProvider(DESCRIPTION)
+                    .getSpecification(parameters.description()));
         }
 
         return spec;
