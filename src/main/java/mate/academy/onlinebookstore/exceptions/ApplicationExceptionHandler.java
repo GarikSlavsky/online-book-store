@@ -33,17 +33,7 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
                 .toList();
 
         body.put("error", errors);
-        return new ResponseEntity<>(body, headers, status);
-    }
-
-    private String getErrorMessage(ObjectError objectError) {
-        if (objectError instanceof FieldError fieldError) {
-            String fieldName = fieldError.getField();
-            String errorMessage = fieldError.getDefaultMessage();
-            return fieldName + ": " + errorMessage;
-        }
-
-        return objectError.getDefaultMessage();
+        return new ResponseEntity<>(body, headers, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -54,5 +44,15 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
         body.put("status", HttpStatus.NOT_FOUND.value());
         body.put("error", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    private String getErrorMessage(ObjectError objectError) {
+        if (objectError instanceof FieldError fieldError) {
+            String fieldName = fieldError.getField();
+            String errorMessage = fieldError.getDefaultMessage();
+            return fieldName + ": " + errorMessage;
+        }
+
+        return objectError.getDefaultMessage();
     }
 }
