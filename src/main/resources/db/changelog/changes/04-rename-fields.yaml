@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3
+      author: mateacademy
+      changes:
+        - renameColumn:
+            tableName: users
+            oldColumnName: shippingAddress
+            newColumnName: shipping_address
+            columnDataType: varchar(255)
+        - renameColumn:
+            tableName: users
+            oldColumnName: lastName
+            newColumnName: last_name
+            columnDataType: varchar(255)
+        - renameColumn:
+            tableName: users
+            oldColumnName: firstName
+            newColumnName: first_name
+            columnDataType: varchar(255)
