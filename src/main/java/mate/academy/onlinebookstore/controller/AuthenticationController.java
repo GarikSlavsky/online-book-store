@@ -17,12 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "User management", description = "Endpoints for managing users.")
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final UserService userService;
 
-    @PostMapping("api/auth/registration")
+    @PostMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Register a new user.")
     public UserResponseDto register(@RequestBody @Valid UserRegistrationRequestDto request)

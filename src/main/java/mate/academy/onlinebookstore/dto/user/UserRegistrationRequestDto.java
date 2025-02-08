@@ -45,7 +45,6 @@ public class UserRegistrationRequestDto {
             example = "Smith")
     private String lastName;
 
-    @NotBlank(message = "Shipping address cannot be blank.")
     @Pattern(regexp = ADDRESS, message = "The address should contain a street, city, and country.")
     @Schema(description = "The real address of the user, including the street, city, and country.",
             example = "123 Main St, City, Country")

@@ -51,9 +51,9 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
             RegistrationException ex) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.UNAUTHORIZED.value());
+        body.put("status", HttpStatus.CONFLICT.value());
         body.put("error", ex.getMessage());
-        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
     private String getErrorMessage(ObjectError objectError) {

@@ -6,6 +6,4 @@ import mate.academy.onlinebookstore.exceptions.RegistrationException;
 
 public interface UserService {
     UserResponseDto register(UserRegistrationRequestDto requestDto) throws RegistrationException;
-
-    UserResponseDto getUserById(long id);
 }
