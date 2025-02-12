@@ -5,7 +5,11 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+
+import java.util.HashSet;
+import java.util.Set;
 import lombok.Data;
+import mate.academy.onlinebookstore.model.Role;
 import mate.academy.onlinebookstore.validation.FieldMatch;
 
 @Data
@@ -49,4 +53,8 @@ public class UserRegistrationRequestDto {
     @Schema(description = "The real address of the user, including the street, city, and country.",
             example = "123 Main St, City, Country")
     private String shippingAddress;
+
+    @Schema(description = "The role of the user. It must be either USER or ADMIN.",
+            example = "USER")
+    private Set<Role.RoleName> roles = new HashSet<>();
 }

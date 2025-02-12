@@ -1,5 +1,7 @@
 package mate.academy.onlinebookstore.config;
 
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 import lombok.RequiredArgsConstructor;
 import mate.academy.onlinebookstore.security.CustomUserDetailService;
 import org.springframework.context.annotation.Bean;
@@ -31,9 +33,11 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/swagger-ui/**", "/auth/registration")
+                        .requestMatchers(
+                                antMatcher("/auth/**"),
+                                antMatcher("/swagger-ui/**"),
+                                antMatcher("/v3/api-docs/**"))
                         .permitAll()
-
                         .anyRequest()
                         .authenticated()
                 )
