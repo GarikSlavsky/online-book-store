@@ -1,10 +1,12 @@
 package mate.academy.onlinebookstore.service.user;
 
+import static mate.academy.onlinebookstore.model.Role.RoleName.ROLE_USER;
+
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import mate.academy.onlinebookstore.dto.user.UserRegistrationRequestDto;
 import mate.academy.onlinebookstore.dto.user.UserResponseDto;
+import mate.academy.onlinebookstore.exceptions.EntityNotFoundException;
 import mate.academy.onlinebookstore.exceptions.RegistrationException;
 import mate.academy.onlinebookstore.mapper.UserMapper;
 import mate.academy.onlinebookstore.model.Role;
@@ -13,6 +15,7 @@ import mate.academy.onlinebookstore.repository.role.RoleRepository;
 import mate.academy.onlinebookstore.repository.user.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +25,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
 
+    @Transactional
     @Override
     public UserResponseDto register(UserRegistrationRequestDto requestDto)
             throws RegistrationException {
@@ -32,12 +36,11 @@ public class UserServiceImpl implements UserService {
 
         User user = userMapper.intoModel(requestDto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        Set<Role> roles = requestDto.getRoles().stream()
-                .map(roleName -> roleRepository.findByName(roleName)
-                        .orElseThrow(() -> new RuntimeException(
-                                "Error: Role " + roleName + " not found.")))
-                .collect(Collectors.toSet());
-        user.setRoles(roles);
+        Role role = roleRepository.findByName(ROLE_USER)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Error: Role " + ROLE_USER + " not found."));
+
+        user.setRoles(Set.of(role));
         return userMapper.intoUserDto(userRepository.save(user));
     }
 }
