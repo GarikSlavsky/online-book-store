@@ -3,10 +3,9 @@ package mate.academy.onlinebookstore.dto.user;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-
-import java.util.HashSet;
 import java.util.Set;
 import lombok.Data;
 import mate.academy.onlinebookstore.model.Role;
@@ -54,7 +53,8 @@ public class UserRegistrationRequestDto {
             example = "123 Main St, City, Country")
     private String shippingAddress;
 
+    @NotNull
     @Schema(description = "The role of the user. It must be either USER or ADMIN.",
             example = "USER")
-    private Set<Role.RoleName> roles = new HashSet<>();
+    private Set<Role.RoleName> roles;
 }
