@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-users
+      author: mateacademy
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: 'emily@mail.com'
+              - column:
+                  name: password
+                  value: '5555vvvv'
+              - column:
+                  name: first_name
+                  value: 'Emily'
+              - column:
+                  name: last_name
+                  value: 'Robinson'
+              - column:
+                  name: shipping_address
+                  value: '13 East St, Toronto, Canada'
+
