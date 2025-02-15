@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
+import java.util.List;
 import lombok.Data;
 
 @Data
@@ -52,7 +53,10 @@ public class CreateBookRequestDto {
             example = "A comprehensive guide to best practices in Java programming.")
     private String description;
 
-    @Schema(description = "URL to the cover image of the book",
+    @Schema(description = "URL to the cover image of the book.",
             example = "http://example.com/images/book-cover.jpg")
     private String coverImage;
+
+    @Schema(description = "Set of categories the book belongs to.")
+    private List<Long> categoryIds;
 }
