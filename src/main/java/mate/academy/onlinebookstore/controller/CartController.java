@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import mate.academy.onlinebookstore.dto.item.ItemAddRequestDto;
 import mate.academy.onlinebookstore.dto.shoppingcart.CartResponseDto;
 import mate.academy.onlinebookstore.service.shoppingcart.CartService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,26 +31,28 @@ public class CartController {
     @PreAuthorize("hasRole('USER')")
     @GetMapping
     @Operation(summary = "Retrieve user's shopping cart.")
-    public CartResponseDto viewCart() {
-        return cartService.getCart();
+    public CartResponseDto viewCart(Pageable pageable) {
+        return cartService.getCart(pageable);
     }
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Add book to user's shopping cart.")
-    public CartResponseDto addBook(@RequestBody @Valid ItemAddRequestDto requestDto) {
-        return cartService.addBookToCart(requestDto);
+    public CartResponseDto addBook(
+            @RequestBody @Valid ItemAddRequestDto requestDto, Pageable pageable) {
+
+        return cartService.addBookToCart(requestDto, pageable);
     }
 
     @PreAuthorize("hasRole('USER')")
     @PutMapping("/items/{cartItemId}")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Update number of books to purchase.")
-    public CartResponseDto updateItem(@RequestParam int quantity,
-                              @PathVariable Long cartItemId) {
+    public CartResponseDto updateItem(
+            @RequestParam int quantity, @PathVariable Long cartItemId, Pageable pageable) {
 
-        return cartService.updateItem(quantity, cartItemId);
+        return cartService.updateItem(quantity, cartItemId, pageable);
     }
 
     @PreAuthorize("hasRole('USER')")

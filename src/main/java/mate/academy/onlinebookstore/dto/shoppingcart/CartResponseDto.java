@@ -1,12 +1,12 @@
 package mate.academy.onlinebookstore.dto.shoppingcart;
 
-import java.util.Set;
+import java.util.List;
 import lombok.Data;
-import mate.academy.onlinebookstore.model.CartItem;
+import mate.academy.onlinebookstore.dto.item.ItemResponseDto;
 
 @Data
 public class CartResponseDto {
     private Long id;
     private Long userId;
-    private Set<CartItem> cartItems;
+    private List<ItemResponseDto> cartItems;
 }

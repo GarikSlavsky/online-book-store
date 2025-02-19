@@ -1,7 +1,9 @@
 package mate.academy.onlinebookstore.service.shoppingcart;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import mate.academy.onlinebookstore.dto.item.ItemAddRequestDto;
+import mate.academy.onlinebookstore.dto.item.ItemResponseDto;
 import mate.academy.onlinebookstore.dto.shoppingcart.CartResponseDto;
 import mate.academy.onlinebookstore.exceptions.EntityNotFoundException;
 import mate.academy.onlinebookstore.mapper.CartMapper;
@@ -11,6 +13,7 @@ import mate.academy.onlinebookstore.model.ShoppingCart;
 import mate.academy.onlinebookstore.model.User;
 import mate.academy.onlinebookstore.repository.item.ItemRepository;
 import mate.academy.onlinebookstore.repository.shoppingcart.CartRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,38 +29,28 @@ public class CartServiceImpl implements CartService {
     private final ItemMapper itemMapper;
 
     @Override
-    public CartResponseDto addBookToCart(ItemAddRequestDto requestDto) {
+    public CartResponseDto addBookToCart(ItemAddRequestDto requestDto, Pageable pageable) {
         ShoppingCart shoppingCart = retrieveShoppingCart();
         CartItem item = itemMapper.intoModel(requestDto);
         shoppingCart.getCartItems().add(item);
         item.setShoppingCart(shoppingCart);
-        //itemRepository.save(item);
-        return cartMapper.intoDto(cartRepository.save(shoppingCart));
+        cartRepository.save(shoppingCart);
+        return retrieveCartContent(pageable);
     }
 
     @Override
-    public CartResponseDto getCart() {
-        return cartMapper.intoDto(retrieveShoppingCart());
+    public CartResponseDto getCart(Pageable pageable) {
+        return retrieveCartContent(pageable);
     }
 
     @Override
-    public CartResponseDto updateItem(int quantity, Long itemId) {
+    public CartResponseDto updateItem(int quantity, Long itemId, Pageable pageable) {
         CartItem item = itemRepository.findById(itemId).orElseThrow(
                 () -> new EntityNotFoundException(
                         "Item with specified ID: " + itemId + " not found."));
-
-        ShoppingCart shoppingCart = retrieveShoppingCart();
-        if (shoppingCart.getCartItems().contains(item)) {
-            shoppingCart.getCartItems().remove(item);
-            item.setQuantity(quantity);
-            itemRepository.save(item);
-            shoppingCart.getCartItems().add(item);
-        } else {
-            throw new EntityNotFoundException("Item with specified ID: " + itemId
-                    + " does not belong to the customer's shopping cart.");
-        }
-
-        return cartMapper.intoDto(cartRepository.save(shoppingCart));
+        item.setQuantity(quantity);
+        itemRepository.save(item);
+        return retrieveCartContent(pageable);
     }
 
     @Override
@@ -77,5 +70,14 @@ public class CartServiceImpl implements CartService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User customer = (User) authentication.getPrincipal();
         return customer.getId();
+    }
+
+    private CartResponseDto retrieveCartContent(Pageable pageable) {
+        CartResponseDto cartResponseDto = cartMapper.intoDto(retrieveShoppingCart());
+        List<ItemResponseDto> itemResponseDtoList = itemRepository.findAllByCustomerId(
+                retrieveUserId(), pageable
+        );
+        cartResponseDto.setCartItems(itemResponseDtoList);
+        return cartResponseDto;
     }
 }

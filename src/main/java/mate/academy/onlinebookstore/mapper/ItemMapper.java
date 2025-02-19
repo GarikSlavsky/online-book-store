@@ -12,6 +12,9 @@ import org.mapstruct.Named;
 
 @Mapper(config = MapperConfig.class, uses = {BookMapper.class})
 public interface ItemMapper {
+
+    @Mapping(source = "book.id", target = "bookId")
+    @Mapping(source = "book.title", target = "bookTitle")
     ItemResponseDto intoDto(CartItem cartItem);
 
     @Mapping(target = "book", source = "bookId", qualifiedByName = "bookFromId")
