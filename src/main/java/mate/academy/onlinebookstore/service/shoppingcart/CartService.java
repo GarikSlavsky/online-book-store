@@ -15,6 +15,4 @@ public interface CartService {
     void removeBookFromCart(Long itemId, Long userId);
 
     void createShoppingCart(User user);
-
-    public Long retrieveUserId();
 }

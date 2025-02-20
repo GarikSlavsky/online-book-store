@@ -8,7 +8,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
@@ -27,8 +26,7 @@ public class ShoppingCart {
     @Id
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @PrimaryKeyJoinColumn(name = "user_id")
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @MapsId
     private User user;
 

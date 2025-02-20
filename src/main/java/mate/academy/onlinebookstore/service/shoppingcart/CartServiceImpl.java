@@ -1,6 +1,7 @@
 package mate.academy.onlinebookstore.service.shoppingcart;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import mate.academy.onlinebookstore.dto.item.ItemAddRequestDto;
@@ -16,8 +17,6 @@ import mate.academy.onlinebookstore.model.ShoppingCart;
 import mate.academy.onlinebookstore.model.User;
 import mate.academy.onlinebookstore.repository.item.ItemRepository;
 import mate.academy.onlinebookstore.repository.shoppingcart.CartRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,16 +37,19 @@ public class CartServiceImpl implements CartService {
         );
 
         CartItem cartItem;
-        if (itemOptional.isEmpty()) {
-            cartItem = itemMapper.intoModel(requestDto);
-            cartItem.setShoppingCart(shoppingCart);
-        } else {
+        if (itemOptional.isPresent()) {
             cartItem = itemOptional.get();
             cartItem.setQuantity(requestDto.getQuantity());
+        } else {
+            cartItem = itemMapper.intoModel(requestDto);
+            cartItem.setShoppingCart(shoppingCart);
         }
 
         itemRepository.save(cartItem);
-        return retrieveCartContent(userId);
+        CartResponseDto cartResponseDto = cartMapper.intoDto(shoppingCart);
+        List<ItemResponseDto> itemResponseDtoList = itemRepository.findAllByCustomerId(userId);
+        cartResponseDto.setCartItems(itemResponseDtoList);
+        return cartResponseDto;
     }
 
     @Override
@@ -78,12 +80,6 @@ public class CartServiceImpl implements CartService {
         cartRepository.save(shoppingCart);
     }
 
-    public Long retrieveUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User customer = (User) authentication.getPrincipal();
-        return customer.getId();
-    }
-
     private ShoppingCart retrieveShoppingCart(Long customerId) {
         return cartRepository.findById(customerId).orElseThrow(
                 () -> new EntityNotFoundException(
@@ -105,7 +101,12 @@ public class CartServiceImpl implements CartService {
     }
 
     private void authenticateUser(CartItem item, Long userId) {
-        if (!item.getShoppingCart().getUser().getId().equals(userId)) {
+        Long itemId = item.getId();
+        Long customerId = itemRepository.findByCartItemId(itemId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "User's ID by CartItem ID: " + itemId + " not found."));
+
+        if (!Objects.equals(customerId, userId)) {
             throw new AccessDeniedException("You are not authorized to delete this item.");
         }
     }

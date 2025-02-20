@@ -10,13 +10,17 @@ import org.springframework.data.repository.query.Param;
 
 public interface ItemRepository extends JpaRepository<CartItem, Long> {
 
-    @Query(value = "SELECT i.id AS id, b.id AS bookId, "
-                        + "b.title AS bookTitle, i.quantity AS quantity "
-                 + "FROM books AS b "
-                 + "INNER JOIN items AS i "
-                 + "ON b.id = i.book_id "
-                 + "WHERE i.cart_id = :customerId", nativeQuery = true)
+    @Query("SELECT new mate.academy.onlinebookstore.dto.item.ItemResponseDto("
+            + "i.id, b.id, b.title, i.quantity) "
+            + "FROM CartItem i "
+            + "JOIN i.book b "
+            + "WHERE i.shoppingCart.id = :customerId")
     List<ItemResponseDto> findAllByCustomerId(@Param("customerId") Long customerId);
 
     Optional<CartItem> findByBookIdAndShoppingCartId(Long bookId, Long shoppingCartId);
+
+    @Query("select i.shoppingCart.id "
+            + "from CartItem i "
+            + "where i.id = :itemId")
+    Optional<Long> findByCartItemId(@Param("itemId") Long itemId);
 }
