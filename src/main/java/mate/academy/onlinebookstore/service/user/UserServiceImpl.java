@@ -10,11 +10,10 @@ import mate.academy.onlinebookstore.exceptions.EntityNotFoundException;
 import mate.academy.onlinebookstore.exceptions.RegistrationException;
 import mate.academy.onlinebookstore.mapper.UserMapper;
 import mate.academy.onlinebookstore.model.Role;
-import mate.academy.onlinebookstore.model.ShoppingCart;
 import mate.academy.onlinebookstore.model.User;
 import mate.academy.onlinebookstore.repository.role.RoleRepository;
-import mate.academy.onlinebookstore.repository.shoppingcart.CartRepository;
 import mate.academy.onlinebookstore.repository.user.UserRepository;
+import mate.academy.onlinebookstore.service.shoppingcart.CartService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +25,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
-    private final CartRepository cartRepository;
+    private final CartService cartService;
 
     @Transactional
     @Override
@@ -44,9 +43,7 @@ public class UserServiceImpl implements UserService {
                         "Error: Role " + ROLE_USER + " not found."));
 
         user.setRoles(Set.of(role));
-        ShoppingCart shoppingCart = new ShoppingCart();
-        shoppingCart.setUser(user);
-        user.setShoppingCart(shoppingCart);
+        cartService.createShoppingCart(user);
         return userMapper.intoUserDto(userRepository.save(user));
     }
 }

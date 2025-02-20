@@ -1,15 +1,20 @@
 package mate.academy.onlinebookstore.service.shoppingcart;
 
 import mate.academy.onlinebookstore.dto.item.ItemAddRequestDto;
+import mate.academy.onlinebookstore.dto.item.ItemUpdateRequestDto;
 import mate.academy.onlinebookstore.dto.shoppingcart.CartResponseDto;
-import org.springframework.data.domain.Pageable;
+import mate.academy.onlinebookstore.model.User;
 
 public interface CartService {
-    CartResponseDto addBookToCart(ItemAddRequestDto requestDto, Pageable pageable);
+    CartResponseDto addBookToCart(ItemAddRequestDto requestDto, Long userId);
 
-    CartResponseDto getCart(Pageable pageable);
+    CartResponseDto getCart(Long userId);
 
-    CartResponseDto updateItem(int quantity, Long itemId, Pageable pageable);
+    CartResponseDto updateItem(ItemUpdateRequestDto requestDto, Long itemId, Long userId);
 
-    void removeBookFromCart(Long itemId);
+    void removeBookFromCart(Long itemId, Long userId);
+
+    void createShoppingCart(User user);
+
+    public Long retrieveUserId();
 }

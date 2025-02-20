@@ -33,7 +33,6 @@ public class ShoppingCart {
     private User user;
 
     @OneToMany(mappedBy = "shoppingCart", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Column(nullable = false)
     private Set<CartItem> cartItems = new HashSet<>();
 
     @Column(nullable = false)
