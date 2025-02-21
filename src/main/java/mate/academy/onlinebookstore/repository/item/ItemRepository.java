@@ -19,8 +19,5 @@ public interface ItemRepository extends JpaRepository<CartItem, Long> {
 
     Optional<CartItem> findByBookIdAndShoppingCartId(Long bookId, Long shoppingCartId);
 
-    @Query("select i.shoppingCart.id "
-            + "from CartItem i "
-            + "where i.id = :itemId")
-    Optional<Long> findByCartItemId(@Param("itemId") Long itemId);
+    Optional<CartItem> findByIdAndShoppingCartId(Long itemId, Long shoppingCartId);
 }
