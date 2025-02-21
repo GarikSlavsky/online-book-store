@@ -13,6 +13,7 @@ import mate.academy.onlinebookstore.model.Role;
 import mate.academy.onlinebookstore.model.User;
 import mate.academy.onlinebookstore.repository.role.RoleRepository;
 import mate.academy.onlinebookstore.repository.user.UserRepository;
+import mate.academy.onlinebookstore.service.shoppingcart.CartService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final CartService cartService;
 
     @Transactional
     @Override
@@ -41,6 +43,7 @@ public class UserServiceImpl implements UserService {
                         "Error: Role " + ROLE_USER + " not found."));
 
         user.setRoles(Set.of(role));
+        cartService.createShoppingCart(user);
         return userMapper.intoUserDto(userRepository.save(user));
     }
 }
