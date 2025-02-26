@@ -1,9 +1,10 @@
-package mate.academy.onlinebookstore.repository.item;
+package mate.academy.onlinebookstore.repository.shoppingcart.item;
 
 import java.util.List;
 import java.util.Optional;
 import mate.academy.onlinebookstore.dto.item.ItemResponseDto;
 import mate.academy.onlinebookstore.model.CartItem;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,4 +21,7 @@ public interface ItemRepository extends JpaRepository<CartItem, Long> {
     Optional<CartItem> findByBookIdAndShoppingCartId(Long bookId, Long shoppingCartId);
 
     Optional<CartItem> findByIdAndShoppingCartId(Long itemId, Long shoppingCartId);
+
+    @EntityGraph(attributePaths = "book")
+    List<CartItem> findAllByShoppingCartId(Long userId);
 }
