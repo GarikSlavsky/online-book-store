@@ -67,17 +67,20 @@ public class OrderController {
     @GetMapping("/{orderId}/items")
     @Operation(summary = "Retrieve all OrderItems for a specific order.")
     public List<OrderItemResponseDto> viewOrderItems(
-            @PathVariable Long orderId, Pageable pageable) {
+            @PathVariable Long orderId, Authentication authentication) {
 
-        return orderService.getAllOrderItems(orderId, pageable);
+        User user = (User) authentication.getPrincipal();
+        return orderService.getAllOrderItems(orderId, user.getId());
     }
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/{orderId}/items/{itemId}")
     @Operation(summary = "Retrieve a specific OrderItem within an order).")
     public OrderItemResponseDto viewSpecifiedOrderItem(@PathVariable Long orderId,
-                                                       @PathVariable Long itemId) {
+                                                       @PathVariable Long itemId,
+                                                       Authentication authentication) {
 
-        return orderService.viewSpecifiedOrderItem(orderId, itemId);
+        User user = (User) authentication.getPrincipal();
+        return orderService.viewSpecifiedOrderItem(orderId, itemId, user.getId());
     }
 }

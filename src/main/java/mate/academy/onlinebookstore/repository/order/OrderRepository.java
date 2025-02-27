@@ -9,8 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
     @EntityGraph(attributePaths = "orderItems")
-    Optional<Order> findById(Long id);
+    List<Order> findAllByUserId(Long userId, Pageable pageable);
 
     @EntityGraph(attributePaths = "orderItems")
-    List<Order> findAllByUserId(Long userId, Pageable pageable);
+    Optional<Order> findByIdAndUserId(Long id, Long userId);
 }

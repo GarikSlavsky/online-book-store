@@ -1,13 +1,17 @@
 package mate.academy.onlinebookstore.repository.order.item;
 
-import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 import mate.academy.onlinebookstore.model.OrderItem;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
-    Set<OrderItem> findByOrderId(Long orderId);
-
-    List<OrderItem> findByOrderId(Long orderId, Pageable pageable);
+    @Query("select oi "
+            + "from OrderItem oi "
+            + "join oi.order o "
+            + "where o.id = :order and o.user.id = :user and oi.id = :item")
+    Optional<OrderItem> findByIdAndOrderIdAndUserId(@Param("order") Long orderId,
+                                                    @Param("item") Long itemId,
+                                                    @Param("user") Long userId);
 }
