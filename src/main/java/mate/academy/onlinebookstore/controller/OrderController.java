@@ -11,6 +11,7 @@ import mate.academy.onlinebookstore.dto.order.UpdateOrderRequestDto;
 import mate.academy.onlinebookstore.dto.orderitem.OrderItemResponseDto;
 import mate.academy.onlinebookstore.model.User;
 import mate.academy.onlinebookstore.service.order.OrderService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,7 +35,7 @@ public class OrderController {
     @PreAuthorize("hasRole('USER')")
     @GetMapping
     @Operation(summary = "Retrieve user's order history.")
-    public List<OrderResponseDto> viewOrderHistory(
+    public Page<OrderResponseDto> viewOrderHistory(
             Authentication authentication, Pageable pageable) {
 
         User user = (User) authentication.getPrincipal();
