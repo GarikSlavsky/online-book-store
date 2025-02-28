@@ -13,8 +13,8 @@ import mate.academy.onlinebookstore.mapper.ItemMapper;
 import mate.academy.onlinebookstore.model.CartItem;
 import mate.academy.onlinebookstore.model.ShoppingCart;
 import mate.academy.onlinebookstore.model.User;
-import mate.academy.onlinebookstore.repository.item.ItemRepository;
 import mate.academy.onlinebookstore.repository.shoppingcart.CartRepository;
+import mate.academy.onlinebookstore.repository.shoppingcart.item.ItemRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -12,7 +12,7 @@ import mate.academy.onlinebookstore.validation.FieldMatch;
 @FieldMatch
 @Schema(description = "Request DTO for a new user signing up.")
 public class UserRegistrationRequestDto {
-    private static final String ADDRESS =
+    public static final String ADDRESS =
             "^(\\d+\\s)?[A-Za-z]+\\s[A-Za-z]+,\\s[A-Za-z]+,\\s[A-Za-z]+$";
 
     @NotBlank(message = "Email cannot be blank.")
