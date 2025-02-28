@@ -20,6 +20,7 @@ import mate.academy.onlinebookstore.repository.order.OrderRepository;
 import mate.academy.onlinebookstore.repository.order.item.OrderItemRepository;
 import mate.academy.onlinebookstore.repository.shoppingcart.item.ItemRepository;
 import mate.academy.onlinebookstore.repository.user.UserRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,11 +37,9 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemMapper orderItemMapper;
 
     @Override
-    public List<OrderResponseDto> getHistory(Long customerId, Pageable pageable) {
-        List<Order> orderList = orderRepository.findAllByUserId(customerId, pageable);
-        return orderList.stream()
-                .map(this::mapToOrderResponseDto)
-                .toList();
+    public Page<OrderResponseDto> getHistory(Long customerId, Pageable pageable) {
+        Page<Order> orders = orderRepository.findAllByUserId(customerId, pageable);
+        return orders.map(this::mapToOrderResponseDto);
     }
 
     @Override

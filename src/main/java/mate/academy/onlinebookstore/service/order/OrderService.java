@@ -5,10 +5,11 @@ import mate.academy.onlinebookstore.dto.order.CreateOrderRequestDto;
 import mate.academy.onlinebookstore.dto.order.OrderResponseDto;
 import mate.academy.onlinebookstore.dto.order.UpdateOrderRequestDto;
 import mate.academy.onlinebookstore.dto.orderitem.OrderItemResponseDto;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface OrderService {
-    List<OrderResponseDto> getHistory(Long customerId, Pageable pageable);
+    Page<OrderResponseDto> getHistory(Long customerId, Pageable pageable);
 
     OrderResponseDto addOrder(Long customerId, CreateOrderRequestDto requestDto);
 
