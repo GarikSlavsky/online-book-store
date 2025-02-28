@@ -2,7 +2,6 @@ package mate.academy.onlinebookstore.service.user;
 
 import static mate.academy.onlinebookstore.model.Role.RoleName.ROLE_USER;
 
-import java.util.HashSet;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import mate.academy.onlinebookstore.dto.user.UserRegistrationRequestDto;
@@ -43,9 +42,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Error: Role " + ROLE_USER + " not found."));
 
-        Set<Role> roles = new HashSet<>();
-        roles.add(role);
-        user.setRoles(roles);
+        user.setRoles(Set.of(role));
         cartService.createShoppingCart(user);
         return userMapper.intoUserDto(userRepository.save(user));
     }
