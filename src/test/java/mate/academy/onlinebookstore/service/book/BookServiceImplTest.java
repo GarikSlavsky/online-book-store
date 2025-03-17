@@ -1,6 +1,10 @@
 package mate.academy.onlinebookstore.service.book;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -10,13 +14,13 @@ import java.util.List;
 import java.util.Optional;
 import mate.academy.onlinebookstore.dto.book.BookDto;
 import mate.academy.onlinebookstore.dto.book.CreateBookRequestDto;
+import mate.academy.onlinebookstore.exceptions.EntityNotFoundException;
 import mate.academy.onlinebookstore.mapper.BookMapper;
 import mate.academy.onlinebookstore.model.Book;
 import mate.academy.onlinebookstore.model.Category;
 import mate.academy.onlinebookstore.repository.book.BookRepository;
 import mate.academy.onlinebookstore.repository.category.CategoryRepository;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +34,7 @@ import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 public class BookServiceImplTest {
+    private static Category category;
     @Mock
     private BookRepository bookRepository;
 
@@ -41,10 +46,9 @@ public class BookServiceImplTest {
 
     @InjectMocks
     private BookServiceImpl bookService;
-    private Category category;
 
-    @BeforeEach
-    void setUp() {
+    @BeforeAll
+    static void beforeAll() {
         category = new Category();
         category.setId(1L);
         category.setName("Category");
@@ -53,12 +57,7 @@ public class BookServiceImplTest {
     @Test
     @DisplayName("Verify saveBook method works properly.")
     void saveBook_ValidRequestDto_ReturnsBookDto() {
-        CreateBookRequestDto requestDto = new CreateBookRequestDto();
-        requestDto.setTitle("Title");
-        requestDto.setAuthor("Author");
-        requestDto.setIsbn("ISBN");
-        requestDto.setPrice(BigDecimal.valueOf(20.00));
-        requestDto.setCategoryIds(List.of(1L));
+        CreateBookRequestDto requestDto = initializeCreateBookRequestDto();
 
         Book book = new Book();
         book.setTitle(requestDto.getTitle());
@@ -68,12 +67,6 @@ public class BookServiceImplTest {
         book.getCategories().add(category);
 
         BookDto expected = new BookDto();
-        expected.setId(1L);
-        expected.setTitle(book.getTitle());
-        expected.setAuthor(book.getAuthor());
-        expected.setIsbn(book.getIsbn());
-        expected.setPrice(book.getPrice());
-        expected.setCategoryIds(List.of(1L));
 
         when(bookMapper.intoModel(requestDto)).thenReturn(book);
         when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
@@ -81,33 +74,26 @@ public class BookServiceImplTest {
         when(bookMapper.intoBookDto(book)).thenReturn(expected);
 
         BookDto actual = bookService.saveBook(requestDto);
-        Assertions.assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(expected);
         verify(bookRepository, times(1)).save(book);
     }
 
     @Test
     @DisplayName("Verify updating a book entity.")
     void updateBook_ValidRequestDto_ReturnsBookDto() {
-        CreateBookRequestDto requestDto = new CreateBookRequestDto();
+        CreateBookRequestDto requestDto = initializeCreateBookRequestDto();
         requestDto.setTitle("New title");
-        requestDto.setAuthor("Author");
-        requestDto.setIsbn("ISBN");
         requestDto.setPrice(BigDecimal.valueOf(25.00));
         requestDto.setCategoryIds(List.of(1L, 2L));
 
         Book book = new Book();
-        book.setTitle("Title");
-        book.setAuthor("Author");
-        book.setIsbn("ISBN");
-        book.setPrice(BigDecimal.valueOf(20.99));
+        book.setTitle(requestDto.getTitle());
+        book.setAuthor(requestDto.getAuthor());
+        book.setIsbn(requestDto.getIsbn());
+        book.setPrice(requestDto.getPrice());
         book.getCategories().add(category);
 
-        BookDto expected = new BookDto();
-        expected.setId(1L);
-        expected.setTitle(requestDto.getTitle());
-        expected.setAuthor(requestDto.getAuthor());
-        expected.setIsbn(requestDto.getIsbn());
-        expected.setPrice(requestDto.getPrice());
+        BookDto expected = initializeBookDto(book);
         expected.setCategoryIds(List.of(1L, 2L));
 
         when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
@@ -116,40 +102,26 @@ public class BookServiceImplTest {
         when(bookMapper.intoBookDto(book)).thenReturn(expected);
 
         BookDto actual = bookService.updateBookById(requestDto, 1L);
-        Assertions.assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(expected);
         verify(bookRepository, times(1)).save(book);
     }
 
     @Test
     @DisplayName("Get a list of books.")
     void getAllBooks_ReturnsBookDtoList() {
-        Book book1 = new Book();
-        book1.setTitle("Title 1");
-        book1.setAuthor("Author 1");
-        book1.setIsbn("ISBN 1");
-        book1.setPrice(BigDecimal.valueOf(20.99));
-        book1.getCategories().add(category);
-        Book book2 = new Book();
+        final Book book1 = initializeBook();
+
+        final Book book2 = new Book();
         book2.setTitle("Title 2");
         book2.setAuthor("Author 2");
         book2.setIsbn("ISBN 2");
         book2.setPrice(BigDecimal.valueOf(25.00));
         book2.getCategories().add(category);
 
-        BookDto bookDto1 = new BookDto();
-        bookDto1.setId(1L);
-        bookDto1.setTitle(book1.getTitle());
-        bookDto1.setAuthor(book1.getAuthor());
-        bookDto1.setIsbn(book1.getIsbn());
-        bookDto1.setPrice(book1.getPrice());
-        bookDto1.setCategoryIds(List.of(1L));
-        BookDto bookDto2 = new BookDto();
+        BookDto bookDto1 = initializeBookDto(book1);
+
+        BookDto bookDto2 = initializeBookDto(book2);
         bookDto2.setId(2L);
-        bookDto2.setTitle(book2.getTitle());
-        bookDto2.setAuthor(book2.getAuthor());
-        bookDto2.setIsbn(book2.getIsbn());
-        bookDto2.setPrice(book2.getPrice());
-        bookDto2.setCategoryIds(List.of(1L));
 
         List<BookDto> expected = List.of(bookDto1, bookDto2);
         Pageable pageable = PageRequest.of(0, 10);
@@ -160,6 +132,63 @@ public class BookServiceImplTest {
         when(bookMapper.intoBookDto(book2)).thenReturn(bookDto2);
 
         List<BookDto> actual = bookService.findAllBooks(pageable);
-        Assertions.assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("Verify saveBook method throws exception for invalid input.")
+    void saveBook_InvalidRequestDto_ThrowsException() {
+        CreateBookRequestDto requestDto = initializeCreateBookRequestDto();
+        requestDto.setTitle(null);
+
+        when(bookMapper.intoModel(requestDto)).thenThrow(IllegalArgumentException.class);
+
+        assertThrows(IllegalArgumentException.class, () -> bookService.saveBook(requestDto));
+        verify(bookRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Verify saveBook method throws exception for non-existent category.")
+    void saveBook_NonExistentCategoryId_ThrowsEntityNotFoundException() {
+        CreateBookRequestDto requestDto = initializeCreateBookRequestDto();
+        requestDto.setCategoryIds(List.of(999L));
+
+        when(categoryRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        EntityNotFoundException thrown = assertThrows(
+                EntityNotFoundException.class, () -> bookService.saveBook(requestDto));
+        assertThat(thrown.getMessage()).isEqualTo("Category with id 999 not found.");
+        verify(bookRepository, never()).save(any());
+    }
+
+    private static CreateBookRequestDto initializeCreateBookRequestDto() {
+        CreateBookRequestDto dto = new CreateBookRequestDto();
+        dto.setTitle("Title");
+        dto.setAuthor("Author");
+        dto.setIsbn("ISBN");
+        dto.setPrice(BigDecimal.valueOf(20.00));
+        dto.setCategoryIds(List.of(1L));
+        return dto;
+    }
+
+    private static Book initializeBook() {
+        Book book = new Book();
+        book.setTitle("Title");
+        book.setAuthor("Author");
+        book.setIsbn("ISBN");
+        book.setPrice(BigDecimal.valueOf(20.99));
+        book.getCategories().add(category);
+        return book;
+    }
+
+    private static BookDto initializeBookDto(Book book) {
+        BookDto dto = new BookDto();
+        dto.setId(1L);
+        dto.setTitle(book.getTitle());
+        dto.setAuthor(book.getAuthor());
+        dto.setIsbn(book.getIsbn());
+        dto.setPrice(book.getPrice());
+        dto.setCategoryIds(List.of(1L));
+        return dto;
     }
 }

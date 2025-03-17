@@ -1,5 +1,7 @@
 package mate.academy.onlinebookstore.service.category;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -9,10 +11,10 @@ import java.util.List;
 import java.util.Optional;
 import mate.academy.onlinebookstore.dto.category.CategoryResponseDto;
 import mate.academy.onlinebookstore.dto.category.CreateCategoryRequestDto;
+import mate.academy.onlinebookstore.exceptions.EntityNotFoundException;
 import mate.academy.onlinebookstore.mapper.CategoryMapper;
 import mate.academy.onlinebookstore.model.Category;
 import mate.academy.onlinebookstore.repository.category.CategoryRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,17 +45,14 @@ public class CategoryServiceImplTest {
 
         Category category = new Category();
         category.setName(categoryDto.getName());
-
-        CategoryResponseDto expected = new CategoryResponseDto();
-        expected.setId(1L);
-        expected.setName(category.getName());
+        CategoryResponseDto expected = initializeCategoryResponseDto(category);
 
         when(categoryMapper.intoModel(categoryDto)).thenReturn(category);
         when(categoryRepository.save(category)).thenReturn(category);
         when(categoryMapper.intoDto(category)).thenReturn(expected);
 
         CategoryResponseDto actual = categoryService.save(categoryDto);
-        Assertions.assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(expected);
         verify(categoryRepository, times(1)).save(category);
     }
 
@@ -65,9 +64,7 @@ public class CategoryServiceImplTest {
         Category category2 = new Category();
         category2.setName("Another Category Name");
 
-        CategoryResponseDto dto1 = new CategoryResponseDto();
-        dto1.setId(1L);
-        dto1.setName(category1.getName());
+        CategoryResponseDto dto1 = initializeCategoryResponseDto(category1);
         CategoryResponseDto dto2 = new CategoryResponseDto();
         dto2.setId(2L);
         dto2.setName(category2.getName());
@@ -81,25 +78,40 @@ public class CategoryServiceImplTest {
         when(categoryMapper.intoDto(category2)).thenReturn(dto2);
 
         List<CategoryResponseDto> actual = categoryService.findAll(pageable);
-        Assertions.assertThat(actual).isEqualTo(expected);
-        Assertions.assertThat(actual).hasSize(2);
+        assertThat(actual).isEqualTo(expected);
+        assertThat(actual).hasSize(2);
     }
 
     @Test
     @DisplayName("Get category by its ID.")
-    void findById_ReturnsCategoryDto() {
+    void getById_ReturnsCategoryDto() {
         Category category = new Category();
         category.setName("Category Name");
-
-        CategoryResponseDto expected = new CategoryResponseDto();
-        expected.setId(1L);
-        expected.setName(category.getName());
+        CategoryResponseDto expected = initializeCategoryResponseDto(category);
 
         when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
         when(categoryMapper.intoDto(category)).thenReturn(expected);
 
         CategoryResponseDto actual = categoryService.getById(100L);
-        Assertions.assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(expected);
         verify(categoryRepository, times(1)).findById(100L);
+    }
+
+    @Test
+    @DisplayName("Get category by ID - Nonexistent ID throws exception.")
+    void getById_NonExistentId_ThrowsEntityNotFoundException() {
+        when(categoryRepository.findById(100L)).thenReturn(Optional.empty());
+
+        EntityNotFoundException thrown = assertThrows(
+                EntityNotFoundException.class, () -> categoryService.getById(100L));
+        assertThat(thrown.getMessage()).isEqualTo("Category with id: 100 not found.");
+        verify(categoryRepository, times(1)).findById(100L);
+    }
+
+    private static CategoryResponseDto initializeCategoryResponseDto(Category category) {
+        CategoryResponseDto dto = new CategoryResponseDto();
+        dto.setId(1L);
+        dto.setName(category.getName());
+        return dto;
     }
 }
