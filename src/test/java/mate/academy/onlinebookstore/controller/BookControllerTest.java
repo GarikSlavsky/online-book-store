@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -23,13 +22,11 @@ import lombok.SneakyThrows;
 import mate.academy.onlinebookstore.dto.book.BookDto;
 import mate.academy.onlinebookstore.dto.book.CreateBookRequestDto;
 import mate.academy.onlinebookstore.exceptions.EntityNotFoundException;
-import mate.academy.onlinebookstore.service.book.BookService;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
@@ -50,9 +47,6 @@ public class BookControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Mock
-    private BookService bookService;
 
     @BeforeAll
     static void beforeAll(
@@ -174,11 +168,8 @@ public class BookControllerTest {
     @WithMockUser(username = "user", roles = {"USER"})
     @DisplayName("Get book by ID - Nonexistent ID throws exception.")
     void getBookById_NonExistentId_ThrowsEntityNotFoundException() throws Exception {
-        when(bookService.getBookById(NON_EXISTENT_ID))
-                .thenThrow(new EntityNotFoundException(EXCEPTION_MESSAGE));
-
         mockMvc.perform(get("/books/{id}", NON_EXISTENT_ID)
-                        .accept(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertInstanceOf(
                         EntityNotFoundException.class, result.getResolvedException()))

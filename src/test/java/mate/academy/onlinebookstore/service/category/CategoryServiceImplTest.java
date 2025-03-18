@@ -2,7 +2,6 @@ package mate.academy.onlinebookstore.service.category;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,6 +27,9 @@ import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 public class CategoryServiceImplTest {
+    private static final long NON_EXISTENT_ID = 999L;
+    private static final long ACTUAL_ID = 1L;
+
     @InjectMocks
     private CategoryServiceImpl categoryService;
 
@@ -80,6 +82,7 @@ public class CategoryServiceImplTest {
         List<CategoryResponseDto> actual = categoryService.findAll(pageable);
         assertThat(actual).isEqualTo(expected);
         assertThat(actual).hasSize(2);
+        verify(categoryRepository, times(1)).findAll(pageable);
     }
 
     @Test
@@ -89,28 +92,28 @@ public class CategoryServiceImplTest {
         category.setName("Category Name");
         CategoryResponseDto expected = initializeCategoryResponseDto(category);
 
-        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
+        when(categoryRepository.findById(ACTUAL_ID)).thenReturn(Optional.of(category));
         when(categoryMapper.intoDto(category)).thenReturn(expected);
 
-        CategoryResponseDto actual = categoryService.getById(100L);
+        CategoryResponseDto actual = categoryService.getById(ACTUAL_ID);
         assertThat(actual).isEqualTo(expected);
-        verify(categoryRepository, times(1)).findById(100L);
+        verify(categoryRepository, times(1)).findById(ACTUAL_ID);
     }
 
     @Test
     @DisplayName("Get category by ID - Nonexistent ID throws exception.")
     void getById_NonExistentId_ThrowsEntityNotFoundException() {
-        when(categoryRepository.findById(100L)).thenReturn(Optional.empty());
+        when(categoryRepository.findById(NON_EXISTENT_ID)).thenReturn(Optional.empty());
 
         EntityNotFoundException thrown = assertThrows(
-                EntityNotFoundException.class, () -> categoryService.getById(100L));
-        assertThat(thrown.getMessage()).isEqualTo("Category with id: 100 not found.");
-        verify(categoryRepository, times(1)).findById(100L);
+                EntityNotFoundException.class, () -> categoryService.getById(NON_EXISTENT_ID));
+        assertThat(thrown.getMessage()).isEqualTo("Category with id: 999 not found.");
+        verify(categoryRepository, times(1)).findById(NON_EXISTENT_ID);
     }
 
     private static CategoryResponseDto initializeCategoryResponseDto(Category category) {
         CategoryResponseDto dto = new CategoryResponseDto();
-        dto.setId(1L);
+        dto.setId(ACTUAL_ID);
         dto.setName(category.getName());
         return dto;
     }

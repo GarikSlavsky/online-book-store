@@ -2,8 +2,6 @@ package mate.academy.onlinebookstore.service.book;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -34,6 +32,8 @@ import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 public class BookServiceImplTest {
+    private static final long NON_EXISTENT_ID = 999L;
+    private static final long ACTUAL_ID = 1L;
     private static Category category;
     @Mock
     private BookRepository bookRepository;
@@ -50,7 +50,7 @@ public class BookServiceImplTest {
     @BeforeAll
     static void beforeAll() {
         category = new Category();
-        category.setId(1L);
+        category.setId(ACTUAL_ID);
         category.setName("Category");
     }
 
@@ -69,7 +69,7 @@ public class BookServiceImplTest {
         BookDto expected = new BookDto();
 
         when(bookMapper.intoModel(requestDto)).thenReturn(book);
-        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
+        when(categoryRepository.findById(ACTUAL_ID)).thenReturn(Optional.of(category));
         when(bookRepository.save(book)).thenReturn(book);
         when(bookMapper.intoBookDto(book)).thenReturn(expected);
 
@@ -84,26 +84,19 @@ public class BookServiceImplTest {
         CreateBookRequestDto requestDto = initializeCreateBookRequestDto();
         requestDto.setTitle("New title");
         requestDto.setPrice(BigDecimal.valueOf(25.00));
-        requestDto.setCategoryIds(List.of(1L, 2L));
 
-        Book book = new Book();
-        book.setTitle(requestDto.getTitle());
-        book.setAuthor(requestDto.getAuthor());
-        book.setIsbn(requestDto.getIsbn());
-        book.setPrice(requestDto.getPrice());
-        book.getCategories().add(category);
-
+        Book book = initializeBookByRequestDto(requestDto);
         BookDto expected = initializeBookDto(book);
-        expected.setCategoryIds(List.of(1L, 2L));
 
-        when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
-        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
+        when(bookRepository.findById(ACTUAL_ID)).thenReturn(Optional.of(book));
+        when(categoryRepository.findById(ACTUAL_ID)).thenReturn(Optional.of(category));
         when(bookRepository.save(book)).thenReturn(book);
         when(bookMapper.intoBookDto(book)).thenReturn(expected);
 
-        BookDto actual = bookService.updateBookById(requestDto, 1L);
+        BookDto actual = bookService.updateBookById(requestDto, ACTUAL_ID);
         assertThat(actual).isEqualTo(expected);
         verify(bookRepository, times(1)).save(book);
+        verify(bookRepository, times(1)).findById(ACTUAL_ID);
     }
 
     @Test
@@ -133,6 +126,7 @@ public class BookServiceImplTest {
 
         List<BookDto> actual = bookService.findAllBooks(pageable);
         assertThat(actual).isEqualTo(expected);
+        verify(bookRepository, times(1)).findAll(pageable);
     }
 
     @Test
@@ -140,25 +134,27 @@ public class BookServiceImplTest {
     void saveBook_InvalidRequestDto_ThrowsException() {
         CreateBookRequestDto requestDto = initializeCreateBookRequestDto();
         requestDto.setTitle(null);
+        Book book = initializeBookByRequestDto(requestDto);
 
         when(bookMapper.intoModel(requestDto)).thenThrow(IllegalArgumentException.class);
 
         assertThrows(IllegalArgumentException.class, () -> bookService.saveBook(requestDto));
-        verify(bookRepository, never()).save(any());
+        verify(bookRepository, never()).save(book);
     }
 
     @Test
     @DisplayName("Verify saveBook method throws exception for non-existent category.")
     void saveBook_NonExistentCategoryId_ThrowsEntityNotFoundException() {
         CreateBookRequestDto requestDto = initializeCreateBookRequestDto();
-        requestDto.setCategoryIds(List.of(999L));
+        requestDto.setCategoryIds(List.of(NON_EXISTENT_ID));
+        Book book = initializeBookByRequestDto(requestDto);
 
-        when(categoryRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(categoryRepository.findById(NON_EXISTENT_ID)).thenReturn(Optional.empty());
 
         EntityNotFoundException thrown = assertThrows(
                 EntityNotFoundException.class, () -> bookService.saveBook(requestDto));
         assertThat(thrown.getMessage()).isEqualTo("Category with id 999 not found.");
-        verify(bookRepository, never()).save(any());
+        verify(bookRepository, never()).save(book);
     }
 
     private static CreateBookRequestDto initializeCreateBookRequestDto() {
@@ -167,7 +163,7 @@ public class BookServiceImplTest {
         dto.setAuthor("Author");
         dto.setIsbn("ISBN");
         dto.setPrice(BigDecimal.valueOf(20.00));
-        dto.setCategoryIds(List.of(1L));
+        dto.setCategoryIds(List.of(ACTUAL_ID));
         return dto;
     }
 
@@ -181,6 +177,16 @@ public class BookServiceImplTest {
         return book;
     }
 
+    private static Book initializeBookByRequestDto(CreateBookRequestDto requestDto) {
+        Book book = new Book();
+        book.setTitle(requestDto.getTitle());
+        book.setAuthor(requestDto.getAuthor());
+        book.setIsbn(requestDto.getIsbn());
+        book.setPrice(requestDto.getPrice());
+        book.getCategories().add(category);
+        return book;
+    }
+
     private static BookDto initializeBookDto(Book book) {
         BookDto dto = new BookDto();
         dto.setId(1L);
@@ -188,7 +194,7 @@ public class BookServiceImplTest {
         dto.setAuthor(book.getAuthor());
         dto.setIsbn(book.getIsbn());
         dto.setPrice(book.getPrice());
-        dto.setCategoryIds(List.of(1L));
+        dto.setCategoryIds(List.of(ACTUAL_ID));
         return dto;
     }
 }

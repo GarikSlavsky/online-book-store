@@ -19,7 +19,6 @@ import javax.sql.DataSource;
 import lombok.SneakyThrows;
 import mate.academy.onlinebookstore.dto.category.CategoryResponseDto;
 import mate.academy.onlinebookstore.dto.category.CreateCategoryRequestDto;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -183,7 +182,7 @@ public class CategoryControllerTest {
         assertTrue(reflectionEquals(expected, actual));
     }
 
-    private static @NotNull List<CategoryResponseDto> getCategoryResponseDtoList() {
+    private static List<CategoryResponseDto> getCategoryResponseDtoList() {
         final CategoryResponseDto responseDto1 = initializeCategoryResponseDto();
 
         final CategoryResponseDto responseDto2 = new CategoryResponseDto();
