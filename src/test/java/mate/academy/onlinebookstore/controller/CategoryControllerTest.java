@@ -12,13 +12,13 @@ import static org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsB
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.sql.DataSource;
 import lombok.SneakyThrows;
 import mate.academy.onlinebookstore.dto.category.CategoryResponseDto;
 import mate.academy.onlinebookstore.dto.category.CreateCategoryRequestDto;
+import mate.academy.onlinebookstore.util.CategoryControllerUtilTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -38,16 +38,19 @@ import org.springframework.web.context.WebApplicationContext;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CategoryControllerTest {
     protected static MockMvc mockMvc;
+    private static final Long ACTUAL_ID = 1L;
+    private static CategoryControllerUtilTest categoryControllerUtilTest;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    @BeforeAll
+    @BeforeAlmoved
     static void beforeAll(
             @Autowired DataSource dataSource,
             @Autowired WebApplicationContext webApplicationContext
     ) throws SQLException {
 
+        categoryControllerUtilTest = new CategoryControllerUtilTest();
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
                 .build();
@@ -83,10 +86,11 @@ public class CategoryControllerTest {
     @Sql(scripts = "classpath:database/category/delete-fiction-category.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void createCategory_ValidRequestDto_Ok() throws Exception {
-        CreateCategoryRequestDto requestDto = initializeCreateCategoryRequestDto();
+        CreateCategoryRequestDto requestDto =
+                categoryControllerUtilTest.initializeCreateCategoryRequestDto();
 
         CategoryResponseDto expected = new CategoryResponseDto();
-        expected.setId(1L);
+        expected.setId(ACTUAL_ID);
         expected.setName(requestDto.getName());
         expected.setDescription(requestDto.getDescription());
 
@@ -112,7 +116,8 @@ public class CategoryControllerTest {
     @WithMockUser(username = "user", roles = {"USER"})
     @DisplayName("Create category without ADMIN role should return Forbidden.")
     void createCategory_NoAdminRole_Forbidden() throws Exception {
-        CreateCategoryRequestDto requestDto = initializeCreateCategoryRequestDto();
+        CreateCategoryRequestDto requestDto =
+                categoryControllerUtilTest.initializeCreateCategoryRequestDto();
 
         String json = objectMapper.writeValueAsString(requestDto);
 
@@ -146,7 +151,8 @@ public class CategoryControllerTest {
     @Test
     @DisplayName("Get all categories.")
     void getAll_GivenCategories_ReturnListOfCategoryDto() throws Exception {
-        List<CategoryResponseDto> expected = getCategoryResponseDtoList();
+        List<CategoryResponseDto> expected =
+                categoryControllerUtilTest.getCategoryResponseDtoList();
 
         MvcResult result = mockMvc.perform(
                 get("/categories").contentType(MediaType.APPLICATION_JSON)
@@ -164,12 +170,12 @@ public class CategoryControllerTest {
 
     @WithMockUser(username = "user", roles = {"USER"})
     @Test
-    @DisplayName("Det category by ID.")
+    @DisplayName("Get category by ID.")
     void getCategoryById_Ok() throws Exception {
-        CategoryResponseDto expected = initializeCategoryResponseDto();
+        CategoryResponseDto expected = categoryControllerUtilTest.initializeCategoryResponseDto();
 
         MvcResult result = mockMvc.perform(
-                        get("/categories/{id}", 1L)
+                        get("/categories/{id}", ACTUAL_ID)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -180,34 +186,5 @@ public class CategoryControllerTest {
 
         assertNotNull(actual);
         assertTrue(reflectionEquals(expected, actual));
-    }
-
-    private static List<CategoryResponseDto> getCategoryResponseDtoList() {
-        final CategoryResponseDto responseDto1 = initializeCategoryResponseDto();
-
-        final CategoryResponseDto responseDto2 = new CategoryResponseDto();
-        responseDto2.setId(2L);
-        responseDto2.setName("Fantasy");
-        responseDto2.setDescription("Stories that involve magic or other supernatural elements.");
-
-        List<CategoryResponseDto> expected = new ArrayList<>();
-        expected.add(responseDto1);
-        expected.add(responseDto2);
-        return expected;
-    }
-
-    private static CategoryResponseDto initializeCategoryResponseDto() {
-        CategoryResponseDto dto = new CategoryResponseDto();
-        dto.setId(1L);
-        dto.setName("Literary fiction");
-        dto.setDescription("A comprehensive guide to best practices in literary fiction.");
-        return dto;
-    }
-
-    private static CreateCategoryRequestDto initializeCreateCategoryRequestDto() {
-        CreateCategoryRequestDto dto = new CreateCategoryRequestDto();
-        dto.setName("Literary fiction");
-        dto.setDescription("A comprehensive guide to best practices in literary fiction.");
-        return dto;
     }
 }
