@@ -44,7 +44,7 @@ public class CategoryControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @BeforeAlmoved
+    @BeforeAll
     static void beforeAll(
             @Autowired DataSource dataSource,
             @Autowired WebApplicationContext webApplicationContext
