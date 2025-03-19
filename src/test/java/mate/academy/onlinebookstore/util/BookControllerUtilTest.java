@@ -58,11 +58,4 @@ public class BookControllerUtilTest {
         expected.add(responseDto2);
         return expected;
     }
-
-    public List<Long> sortCategoryIds(BookDto dto) {
-        return dto.getCategoryIds()
-                .stream()
-                .sorted(Long::compare)
-                .toList();
-    }
 }

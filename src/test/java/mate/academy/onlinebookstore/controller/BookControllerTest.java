@@ -13,6 +13,7 @@ import static org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsB
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import javax.sql.DataSource;
@@ -117,8 +118,8 @@ public class BookControllerTest {
         assertNotNull(actual);
         assertEquals(0, expected.getPrice().compareTo(actual.getPrice()));
         assertEquals(
-                bookControllerUtilTest.sortCategoryIds(expected),
-                bookControllerUtilTest.sortCategoryIds(actual)
+                new HashSet<>(expected.getCategoryIds()),
+                new HashSet<>(actual.getCategoryIds())
         );
         assertTrue(reflectionEquals(expected, actual, "id", "price", "categoryIds"));
     }
@@ -142,9 +143,10 @@ public class BookControllerTest {
         assertEquals(expected.size(), actual.length);
         for (int i = 0; i < expected.size(); i++) {
             assertEquals(
-                    bookControllerUtilTest.sortCategoryIds(expected.get(i)),
-                    bookControllerUtilTest.sortCategoryIds(actual[i])
+                    new HashSet<>(expected.get(i).getCategoryIds()),
+                    new HashSet<>(actual[i].getCategoryIds())
             );
+
             assertTrue(reflectionEquals(
                     expected.get(i), actual[i],"price", "categoryIds"));
         }
@@ -169,9 +171,10 @@ public class BookControllerTest {
         assertNotNull(actual);
         assertEquals(0, expected.getPrice().compareTo(actual.getPrice()));
         assertEquals(
-                bookControllerUtilTest.sortCategoryIds(expected),
-                bookControllerUtilTest.sortCategoryIds(actual)
+                new HashSet<>(expected.getCategoryIds()),
+                new HashSet<>(actual.getCategoryIds())
         );
+
         assertTrue(reflectionEquals(expected, actual, "price", "categoryIds"));
     }
 
