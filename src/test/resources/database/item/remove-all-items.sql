@@ -1,0 +1,2 @@
+DELETE FROM items;
+DELETE FROM books;

@@ -1,4 +1,4 @@
-package mate.academy.onlinebookstore.service.book;
+package mate.academy.onlinebookstore.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -17,6 +17,7 @@ import mate.academy.onlinebookstore.model.Book;
 import mate.academy.onlinebookstore.model.Category;
 import mate.academy.onlinebookstore.repository.book.BookRepository;
 import mate.academy.onlinebookstore.repository.category.CategoryRepository;
+import mate.academy.onlinebookstore.service.book.BookServiceImpl;
 import mate.academy.onlinebookstore.util.BookServiceUtilTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -69,7 +70,7 @@ public class BookServiceImplTest {
         book.setPrice(requestDto.getPrice());
         book.getCategories().add(category);
 
-        BookDto expected = new BookDto();
+        BookDto expected = bookServiceUtilTest.initializeBookDto(book);
 
         when(bookMapper.intoModel(requestDto)).thenReturn(book);
         when(categoryRepository.findById(ACTUAL_ID)).thenReturn(Optional.of(category));
