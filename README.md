@@ -28,7 +28,7 @@ Welcome to Shopping Cart Management System, a web application designed to simpli
 
 - Spring Security: Ensures secure authentication and role-based access control.
 
-- Spring Data JPA: Facilitates database operations with MySQL.
+- Spring Data JPA: Facilitates database operations with  MySQL.
 
 - Swagger/OpenAPI: Documents the REST API endpoints and offers interactive testing.
 
