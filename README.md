@@ -5,6 +5,7 @@ Introduction
 Welcome to Shopping Cart Management System, a web application designed to simplify online shopping by offering powerful cart management features. This project demonstrates my expertise in backend development with Spring Boot, Spring Security, and database technologies, focusing on scalability and secure user interactions.
 
 
+
 Features
 
 Add and Remove Items: Users can effortlessly add or remove items from their shopping cart.
