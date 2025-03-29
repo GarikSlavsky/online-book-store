@@ -40,6 +40,8 @@ Welcome to Shopping Cart Management System, a web application designed to simpli
 
 - Docker (v28.0.1): Containerization platform used for deploying and managing the application in isolated environments.
 
+- Spring Data JPA: Facilitates database operations with  MySQL.
+
 - Liquibase (4.29.2): Handles database migrations and schema management (includes plugins for Maven).
 
 - MySQL Connector (8.2.0): Establishes connections between the Java application and the MySQL database.
