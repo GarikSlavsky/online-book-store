@@ -43,7 +43,8 @@ public class UserServiceImpl implements UserService {
                         "Error: Role " + ROLE_USER + " not found."));
 
         user.setRoles(Set.of(role));
+        userRepository.save(user);
         cartService.createShoppingCart(user);
-        return userMapper.intoUserDto(userRepository.save(user));
+        return userMapper.intoUserDto(user);
     }
 }
