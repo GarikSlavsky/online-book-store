@@ -66,6 +66,9 @@ Welcome to Shopping Cart Management System, a web application designed to simpli
 
 The schema includes tables for `users`, `roles`, `shopping_carts`, `items`, and `users_roles`. Each table ensures efficient management of user actions, item storage, and shopping cart operations.
 
+### Postman Documentation
+For detailed API testing instructions, visit the [Postman Collection](https://web.postman.co/documentation/41098914-81c1169f-bd95-486a-8953-b2802acceeb5).
+
 ## Visual Diagrams
 
 ### 1. Model Diagram
@@ -84,9 +87,9 @@ Below is the **database diagram**, showing the table structures, keys, and relat
 
 ## How to Run the Project
 
-1. Prerequisites: 
+1. Prerequisites:
 
-- Install Java (version 17 or higher). 
+- Install Java (version 17 or higher).
 
 - Install Maven (version 3.6 or higher).
 

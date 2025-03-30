@@ -4,5 +4,5 @@ import mate.academy.onlinebookstore.dto.book.BookSearchParametersDto;
 import org.springframework.data.jpa.domain.Specification;
 
 public interface SpecificationBuilder<T> {
-    public Specification<T> build(BookSearchParametersDto parameters);
+    Specification<T> build(BookSearchParametersDto parameters);
 }
