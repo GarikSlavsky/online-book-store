@@ -66,37 +66,84 @@ Welcome to Shopping Cart Management System, a web application designed to simpli
 
 The schema includes tables for `users`, `roles`, `shopping_carts`, `items`, and `users_roles`. Each table ensures efficient management of user actions, item storage, and shopping cart operations.
 
+## Brief description of application controllers
+
+1. ### User Management (/auth)
+   This controller handles user authentication and registration processes:
+
+- `POST /auth/registration`: Register a new user.
+
+- `POST /auth/login`: Log in an authenticated user and retrieve a token.
+
+2. ### Shopping Cart Management (/cart)
+   This controller manages user shopping carts:
+
+- `GET /cart`: Retrieve the shopping cart of the authenticated user.
+
+- `POST /cart`: Add a book to the user's shopping cart.
+
+- `PUT /cart/items/{cartItemId}`: Update the quantity of a specific book in the shopping cart.
+
+- `DELETE /cart/items/{cartItemId}`: Remove a book from the shopping cart.
+
+3. ### Book Management (/books)
+   Manages the operations related to books:
+
+- `GET /books`: Retrieve a list of all books.
+
+- `GET /books/{id}`: Retrieve details of a specific book by its ID.
+
+- `POST /books`: Add a new book (Admin only).
+
+- `PUT /books/{id}`: Update an existing book's details (Admin only).
+
+- `DELETE /books/{id}`: Delete a book by its ID (Admin only).
+
+- `GET /books/search`: Search for books by title, author, or other parameters.
+
+4. ### Category Management (/categories)
+   Handles operations related to categories:
+
+- `POST /categories`: Create a new category (Admin only).
+
+- `GET /categories`: Retrieve a list of all categories.
+
+- `GET /categories/{id}`: Get details of a specific category by its ID.
+
+- `PUT /categories/{id}`: Update a category's details (Admin only).
+
+- `DELETE /categories/{id}`: Remove a category by its ID (Admin only).
+
+- `GET /categories/{id}/books`: Retrieve books belonging to a specific category.
+
+5. ### Order Management (/orders)
+   This controller handles order-related processes:
+
+- `GET /orders`: View the authenticated user's order history.
+
+- `POST /orders`: Create a new order for the user.
+
+- `PATCH /orders/{id}`: Update the status of an order (Admin only).
+
+- `GET /orders/{orderId}/items`: View items in a specific order.
+
+- `GET /orders/{orderId}/items/{itemId}`: View details of a specific order item.
+
 ### Postman Documentation
 For detailed API testing instructions, visit the [Postman Collection](https://web.postman.co/documentation/41098914-81c1169f-bd95-486a-8953-b2802acceeb5).
 
-## Visual Diagrams
-
-### 1. Model Diagram
+## Model Diagram
 Below is the **model diagram**, which illustrates the structure of entities and their relationships in the application:
 
 ![Model Diagram](docs/model-diagram.JPG)
 
 ---
 
-### 2. Database Diagram
-Below is the **database diagram**, showing the table structures, keys, and relationships:
+## How to Launch the Project with Docker
 
-![Database Diagram](docs/database-diagram.JPG)
+1. Clone the Repository:
 
----
-
-## How to Run the Project
-
-1. Prerequisites:
-
-- Install Java (version 17 or higher).
-
-- Install Maven (version 3.6 or higher).
-
-- Set up MySQL and create a database named `shopping_cart`.
-
-2. Steps:
-- Clone the repository:
+- Clone the project to your local machine:
 
 `git clone` [repository](https://github.com/GarikSlavsky/online-book-store)
 
@@ -104,29 +151,50 @@ Below is the **database diagram**, showing the table structures, keys, and relat
 
 `cd online-book-store`
 
-- Configure the database in the application.properties file:
+2. Set Up Environment Variables:
 
-```properties
-
-        spring.datasource.url=jdbc:mysql://localhost:3306/shopping_cart
-
-        spring.datasource.username=root
-
-        spring.datasource.password=your_password
-```
-
-3. Build and run the application:
+- Create a .env file in the root directory with the following content:
 
 ```
-        mvn clean install
+MYSQLDB_ROOT_PASSWORD=password
+MYSQLDB_DATABASE=test
+MYSQLDB_LOCAL_PORT=3307
+MYSQLDB_DOCKER_PORT=3306
+MYSQLDB_USER=root
+MYSQLDB_PASSWORD=password
 
-        mvn spring-boot:run
+SPRING_LOCAL_PORT=8088
+SPRING_DOCKER_PORT=8080
+DEBUG_PORT=5005
 ```
-4. Access the application:
+Make sure this file is kept secure and not shared publicly.
+
+3. Build and Start the Containers:
+
+```
+docker-compose build
+docker-compose up
+```
+
+- This will:
+
+Start the MySQL container with your configured settings.
+
+Build and run the online-book-store application.
+
+Ensure the app waits until the database is ready (health checks).
+
+4. Access the Application:
+
+- Once the containers are running, the application will be accessible at: [lonk](http://localhost:8088).
 
 - Swagger UI: Navigate to [swagger](http://localhost:8088/swagger-ui/index.html#/) to explore the APIs.
 
 - API Endpoints: Use Postman or cURL to interact with endpoints, e.g., `/cart`.
+
+5. Stop and Clean Up:
+
+To stop and remove the containers, networks, and volumes: `docker-compose down`.
 
 ## Challenges & Learnings
 
@@ -148,7 +216,7 @@ These challenges enhanced my understanding of backend development and problem-so
 
 ## Demo Video
 
-[Watch the Loom demo](https://www.loom.com/share/241e906d6f1b4eb08208758298a981ae?sid=06c4539e-6368-4bef-8ca7-76f84857591a) to see the application in action.
+[Watch the Loom demo](https://www.loom.com/share/3dc3335c32094cdaab03587ca17a4246?sid=f8418463-1748-4689-91d6-a92bd9430894) to see the application in action.
 
 ## Contributing
 
